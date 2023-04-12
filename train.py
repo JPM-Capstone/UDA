@@ -11,7 +11,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pad_sequence
 from transformers import RobertaForSequenceClassification
-from torch.utils.data import DataLoader, ConcatDataset
+from torch.utils.data import DataLoader
 from data import LabeledDataset, UnlabeledDataset
 
 
@@ -123,7 +123,7 @@ def evaluate(model, val_loader, criterion):
 def train(model, labeled_train_loader, unlabeled_train_loader, val_loader, config, results_path):
 
     # Define the optimizer and loss function
-    optimizer = optim.AdamW(model.parameters(), lr=2e-5)
+    optimizer = optim.AdamW(model.parameters(), lr=5e-5)
     supervised_criterion = nn.CrossEntropyLoss(reduction='none')
     unsupervised_criterion = nn.KLDivLoss(reduction='none')
     val_criterion = nn.CrossEntropyLoss()
