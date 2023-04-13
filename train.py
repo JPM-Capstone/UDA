@@ -118,7 +118,7 @@ def evaluate(model, val_loader, criterion):
             val_loss += criterion(outputs.logits, labels).item()
             val_acc += (outputs.logits.argmax(dim=1) == labels).sum().item()
 
-    return val_loss, val_acc
+    return val_loss/len(val_loader), val_acc/len(val_loader.dataset)
 
 def train(model, labeled_train_loader, unlabeled_train_loader, val_loader, config, results_path):
 
@@ -158,7 +158,7 @@ def train(model, labeled_train_loader, unlabeled_train_loader, val_loader, confi
 
         torch.save(model.state_dict(), os.path.join(results_path, f"epoch_{epoch + 1}.pt"))
 
-        print(f'Epoch {epoch+1}: val_loss={val_loss/len(val_loader):.4f}, val_acc={val_acc/len(val_loader.dataset):.4f}')
+        print(f'Epoch {epoch+1}: val_loss={val_loss:.4f}, val_acc={val_acc:.4f}')
 
 def main(config_name):
 
