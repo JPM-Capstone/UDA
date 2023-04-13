@@ -244,7 +244,7 @@ def collate_batch(batch):
         input_ids = pad_sequence(input_ids, batch_first = True, padding_value = PAD_token)
         attention_mask = pad_sequence(attention_mask, batch_first = True, padding_value = 0)
                 
-        return input_ids, attention_mask, labels
+        return input_ids, attention_mask, torch.tensor(labels)
     
     else:
 
