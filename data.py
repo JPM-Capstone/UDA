@@ -32,7 +32,7 @@ class LabeledDataset(Dataset):
 
         attention_mask = torch.tensor(np.array(['1'] + attention_mask.split()[1:-1] + ['1'], dtype=np.int64))
 
-        return input_ids, attention_mask, label
+        return input_ids, attention_mask, torch.tensor(label)
 
 
 class UnlabeledDataset(Dataset):
