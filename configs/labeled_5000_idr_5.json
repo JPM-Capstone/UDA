@@ -1,12 +1,13 @@
 {
     "train_labeled_idx_name": "msr_30_equal_5000_labeled_indices.pt",
     "train_unlabeled_idx_name": "msr_30_idr_5_50000_unlabeled_indices.pt",
-     "epochs": 4,
-     "steps_per_epoch": 256,
-     "max_batch_size": 112,
-     "min_batch_size": 8,
-     "uda_coeff": 1,
-     "uda_confidence_thresh": 0.45,
-     "uda_softmax_temp": 0.85,
-     "tsa": "linear_schedule"
+    "epochs": 4,
+    "steps_per_epoch": 256,
+    "max_batch_size": 112,
+    "min_batch_size": 8,
+    "val_batch_size": 32,
+    "uda_coeff": 1,
+    "uda_confidence_thresh": 0.45,
+    "uda_softmax_temp": 0.85,
+    "tsa": "linear_schedule"
 }
