@@ -213,7 +213,7 @@ def main(config_name):
         f.write(f"Labeled Batch Size = {labeled_batch_size}\n")
 
         num_labeled_one_epoch = labeled_batch_size * (len(unlabeled_train) // unlabeled_batch_size) / len(labeled_train)
-        f.write(f"Number of epochs through labeled data = {config['epochs'] * num_labeled_one_epoch}")
+        f.write(f"Number of epochs through labeled data = {config['epochs'] * num_labeled_one_epoch}\n")
 
         f.write(f"Unlabeled Batch Size = {unlabeled_batch_size}\n")
         f.write(f"Number of epochs through labeled data = {config['epochs']}")
@@ -233,7 +233,7 @@ def collate_batch(batch):
     Labeled batch: input_ids, attention_mask, labels
     Unlabeled batch: input_ids, attention_mask, aug_input_ids, aug_attention_mask
     """
-    if batch.shape[1] == 3:
+    if len(batch[0]) == 3:
 
         input_ids, attention_mask, labels = [], [], []
         for (_input, _mask, _label) in batch:
