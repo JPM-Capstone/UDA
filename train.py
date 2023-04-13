@@ -83,7 +83,7 @@ def train_epoch(model, labeled_train_loader, unlabeled_train_loader, optimizer,
     model.train()
 
     final_losses, sup_losses, unsup_losses = [], [], []
-    for unlabeled_batch in unlabeled_train_loader:
+    for unlabeled_batch in tqdm(unlabeled_train_loader):
 
         labeled_batch = next(labeled_train_loader)
 
@@ -138,7 +138,7 @@ def train(model, labeled_train_loader, unlabeled_train_loader, val_loader, confi
 
 
     model.to(DEVICE)
-    for epoch in tqdm(range(config['epochs'])):
+    for epoch in range(config['epochs']):
 
         final_losses, sup_losses, unsup_losses = train_epoch(model, labeled_train_loader, unlabeled_train_loader, optimizer, 
                                                              supervised_criterion, unsupervised_criterion, epoch + 1, config, results_path)
