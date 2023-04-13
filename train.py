@@ -201,7 +201,7 @@ def main(config_name):
     if not os.path.exists(config_results_path):
         os.makedirs(config_results_path)
 
-    num_results = glob(os.path.join(config_results_path, f"run_*"))
+    num_results = len(glob(os.path.join(config_results_path, f"run_*")))
 
     if num_results == 5:
         raise ValueError("5 runs of this configuration already exist")
