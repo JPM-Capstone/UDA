@@ -42,7 +42,7 @@ def get_unsupervised_loss(model, unlabeled_batch, unsupervised_criterion, config
     aug_log_prob = F.log_softmax(aug_outputs.logits / uda_softmax_temp, dim = -1)
 
     loss = torch.sum(unsupervised_criterion(aug_log_prob, prob), dim=-1)
-    loss = torch.sum(loss * unsup_loss_mask, dim=-1) / torch.max(torch.sum(unsup_loss_mask, dim=-1), 1)
+    loss = torch.sum(loss * unsup_loss_mask, dim=-1) / torch.max(torch.sum(unsup_loss_mask, dim=-1), torch.tensor([1.]).to(DEVICE))
 
     return loss
 
@@ -73,7 +73,7 @@ def get_supervised_loss(model, labeled_batch, supervised_criterion, current_epoc
     larger_than_threshold = torch.exp(-loss) > tsa_thresh 
 
     loss_mask = torch.ones_like(labels, dtype=torch.float32) * (1 - larger_than_threshold.type(torch.float32))
-    loss = torch.sum(loss * loss_mask, dim=-1) / torch.max(torch.sum(loss_mask, dim=-1), 1)
+    loss = torch.sum(loss * loss_mask, dim=-1) / torch.max(torch.sum(loss_mask, dim=-1), torch.tensor([1.]).to(DEVICE))
 
     return loss
 
