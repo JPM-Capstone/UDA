@@ -39,7 +39,7 @@ class UnlabeledDataset(Dataset):
 
     def __init__(self, idx_name):
 
-        idx = torch.load(os.path.join("indicies", idx_name))
+        idx = torch.load(os.path.join("indices", idx_name))
 
         self.in_domain = pd.read_csv(os.path.join("reduced_data", "yahoo_train.csv"), 
                                      index_col=0).loc[idx['in_domain_idx']]
