@@ -1,4 +1,4 @@
-name: jpm_nlp
+name: uda
 channels:
   - pytorch
   - nvidia
