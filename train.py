@@ -20,6 +20,7 @@ NUM_LABELS = 10 # Number of labels in Yahoo
 PAD_token = 1 # RoBERTa 
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+GPU = torch.cuda.get_device_name() if torch.cuda.is_available() else None
 
 def get_unsupervised_loss(model, unlabeled_batch, unsupervised_criterion, config):
 
@@ -147,18 +148,17 @@ def train(model, labeled_train_loader, unlabeled_train_loader, val_loader, confi
         # evaluate the model on the validation set
         val_loss, val_acc = evaluate(model, val_loader, val_criterion)
 
-        with open(os.path.join(results_path, "history.pkl"), 'wb') as f:
-            logs = pickle.load(f)
-            logs['final_losses'].extend(final_losses)
-            logs['supervised_losses'].extend(sup_losses)
-            logs['unsupervised_losses'].extend(unsup_losses)
-            logs['val_losses'].append(val_loss)
-            logs['val_accuracy'].append(val_acc)
-            pickle.dump(logs, f)
+        logs = pickle.load(open(os.path.join(results_path, "history.pkl"), 'rb'))
+        logs['final_losses'].extend(final_losses)
+        logs['supervised_losses'].extend(sup_losses)
+        logs['unsupervised_losses'].extend(unsup_losses)
+        logs['val_losses'].append(val_loss)
+        logs['val_accuracy'].append(val_acc)
+        pickle.dump(logs, open(os.path.join(results_path, "history.pkl"), 'wb'))
 
         torch.save(model.state_dict(), os.path.join(results_path, f"epoch_{epoch + 1}.pt"))
 
-        print(f'Epoch {epoch+1}: val_loss={val_loss:.4f}, val_acc={val_acc:.4f}')
+        # print(f'Epoch {epoch+1}: val_loss={val_loss:.4f}, val_acc={val_acc:.4f}')
 
 def main(config_name):
 
@@ -198,16 +198,11 @@ def main(config_name):
                             collate_fn = collate_batch)
     
     config_results_path = os.path.join("results", config_name)
-    if not os.path.exists(config_results_path):
-        os.makedirs(config_results_path)
+    os.makedirs(config_results_path, exist_ok=True)
 
     num_results = len(glob(os.path.join(config_results_path, f"run_*")))
-
-    if num_results == 5:
-        raise ValueError("5 runs of this configuration already exist")
-    else:
-        run_results_path = os.path.join(config_results_path, f"run_{num_results + 1}")
-        os.makedirs(run_results_path)
+    run_results_path = os.path.join(config_results_path, f"run_{num_results + 1}")
+    os.makedirs(run_results_path)
 
     with open(os.path.join(config_results_path, "info.txt"), 'w') as f:
         f.write(f"Labeled Batch Size = {labeled_batch_size}\n")
@@ -220,13 +215,13 @@ def main(config_name):
 
     
     # train the model
-    start_time = time.time()
+    # start_time = time.time()
     train(model, labeled_train_loader, unlabeled_train_loader, val_loader, config, run_results_path)
-    end_time = time.time()
+    # end_time = time.time()
 
-    training_time_hours, training_time_minutes = divmod(end_time - start_time, 3600)
+    # training_time_hours, training_time_minutes = divmod(end_time - start_time, 3600)
 
-    print(f"Finished training in: {int(training_time_hours)} hours, {int(training_time_minutes)} minutes")
+    # print(f"Finished training in: {int(training_time_hours)} hours, {int(training_time_minutes)} minutes")
 
 def collate_batch(batch):
     """
@@ -263,6 +258,10 @@ def collate_batch(batch):
         return input_ids, attention_mask, aug_input_ids, aug_attention_mask
 
 def get_batch_size(num_samples, config):
+
+    if GPU:
+        if GPU == 'Quadro RTX 8000': config['max_batch_size'] = 8
+        elif GPU == 'NVIDIA A100-SXM4-80GB': config['max_batch_size'] = 12
     
     batch_size = min(num_samples//config['steps_per_epoch'], config['max_batch_size'])
     batch_size = max(batch_size, config['min_batch_size'])

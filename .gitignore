@@ -1,6 +1,6 @@
 # data is too large
-all_backtranslations/*
-reduced_data/*
+all_backtranslations/*.pkl
+reduced_data/*.csv
 
 # model weights are too large
 results/*/*.pt
