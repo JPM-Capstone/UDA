@@ -29,12 +29,13 @@ def get_unsupervised_loss(model, unlabeled_batch, unsupervised_criterion, config
     aug_input_ids = unlabeled_batch[2].to(DEVICE)
     aug_attention_mask = unlabeled_batch[3].to(DEVICE)
 
-    outputs = model(input_ids, attention_mask=attention_mask)
-    prob = F.softmax(outputs.logits, dim = -1) # KLdiv target
+    with torch.no_grad():
+        outputs = model(input_ids, attention_mask=attention_mask)
+        prob = F.softmax(outputs.logits, dim = -1) # KLdiv target
 
-    # confidence-based masking
-    unsup_loss_mask = torch.max(prob, dim=-1)[0] > config['uda_confidence_thresh']
-    unsup_loss_mask = unsup_loss_mask.type(torch.float32).to(DEVICE)
+        # confidence-based masking
+        unsup_loss_mask = torch.max(prob, dim=-1)[0] > config['uda_confidence_thresh']
+        unsup_loss_mask = unsup_loss_mask.type(torch.float32).to(DEVICE)
 
     aug_outputs = model(aug_input_ids, attention_mask=aug_attention_mask)
 
@@ -48,7 +49,7 @@ def get_unsupervised_loss(model, unlabeled_batch, unsupervised_criterion, config
     return loss
 
 # TSA
-def get_tsa_thresh(schedule, current_epoch, total_epochs, start, end):
+def get_tsa_thresh(schedule, current_epoch, total_epochs, start, end = 1):
     training_progress = torch.tensor(float(current_epoch) / float(total_epochs))
     if schedule == 'linear_schedule':
         threshold = training_progress
@@ -70,7 +71,7 @@ def get_supervised_loss(model, labeled_batch, supervised_criterion, current_epoc
     outputs = model(input_ids, attention_mask=attention_mask)
     loss = supervised_criterion(outputs.logits, labels)
 
-    tsa_thresh = get_tsa_thresh(config['tsa'], current_epoch, config['epochs'], start=1./outputs.logits.shape[-1], end=1)
+    tsa_thresh = get_tsa_thresh(config['tsa'], current_epoch, config['epochs'], start=1./outputs.logits.shape[-1])
     larger_than_threshold = torch.exp(-loss) > tsa_thresh 
 
     loss_mask = torch.ones_like(labels, dtype=torch.float32) * (1 - larger_than_threshold.type(torch.float32))
@@ -79,7 +80,7 @@ def get_supervised_loss(model, labeled_batch, supervised_criterion, current_epoc
     return loss
 
 def train_epoch(model, labeled_train_loader, unlabeled_train_loader, optimizer, 
-                supervised_criterion, unsupervised_criterion, epoch, config, results_path):
+                supervised_criterion, unsupervised_criterion, epoch, config):
 
     model.train()
 
@@ -142,7 +143,7 @@ def train(model, labeled_train_loader, unlabeled_train_loader, val_loader, confi
     for epoch in range(config['epochs']):
 
         final_losses, sup_losses, unsup_losses = train_epoch(model, labeled_train_loader, unlabeled_train_loader, optimizer, 
-                                                             supervised_criterion, unsupervised_criterion, epoch + 1, config, results_path)
+                                                             supervised_criterion, unsupervised_criterion, epoch + 1, config)
         
         
         # evaluate the model on the validation set
