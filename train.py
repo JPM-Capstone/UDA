@@ -72,9 +72,9 @@ def get_supervised_loss(model, labeled_batch, supervised_criterion, current_epoc
     loss = supervised_criterion(outputs.logits, labels)
 
     tsa_thresh = get_tsa_thresh(config['tsa'], current_epoch, config['epochs'], start=1./outputs.logits.shape[-1])
-    larger_than_threshold = torch.exp(-loss) > tsa_thresh 
+    smaller_than_threshold = torch.exp(-loss) <= tsa_thresh 
 
-    loss_mask = torch.ones_like(labels, dtype=torch.float32) * (1 - larger_than_threshold.type(torch.float32))
+    loss_mask = torch.ones_like(labels, dtype=torch.float32) * smaller_than_threshold.type(torch.float32)
     loss = torch.sum(loss * loss_mask, dim=-1) / torch.max(torch.sum(loss_mask, dim=-1), torch.tensor([1.]).to(DEVICE))
 
     return loss
@@ -125,7 +125,7 @@ def evaluate(model, val_loader, criterion):
 def train(model, labeled_train_loader, unlabeled_train_loader, val_loader, config, results_path):
 
     # Define the optimizer and loss function
-    optimizer = optim.AdamW(model.parameters(), lr=5e-5)
+    optimizer = optim.AdamW(model.parameters(), lr=5e-6)
     supervised_criterion = nn.CrossEntropyLoss(reduction='none')
     unsupervised_criterion = nn.KLDivLoss(reduction='none')
     val_criterion = nn.CrossEntropyLoss()
