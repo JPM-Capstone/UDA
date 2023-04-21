@@ -205,25 +205,27 @@ def main(config_name):
     run_results_path = os.path.join(config_results_path, f"run_{num_results + 1}")
     os.makedirs(run_results_path)
 
-    with open(os.path.join(config_results_path, "info.txt"), 'w') as f:
-        f.write(f"Labeled Batch Size = {labeled_batch_size}\n")
+    logger = open(os.path.join(run_results_path,'std.log'),'w')
 
-        num_labeled_one_epoch = labeled_batch_size * (len(unlabeled_train) // unlabeled_batch_size) / len(labeled_train)
-        f.write(f"Number of epochs through labeled data = {config['epochs'] * num_labeled_one_epoch}\n")
+    logger.write(f"Labeled Batch Size = {labeled_batch_size}\n")
 
-        f.write(f"Unlabeled Batch Size = {unlabeled_batch_size}\n")
-        f.write(f"Number of epochs through labeled data = {config['epochs']}")
+    num_labeled_one_epoch = labeled_batch_size * (len(unlabeled_train) // unlabeled_batch_size) / len(labeled_train)
+    logger.write(f"\nNumber of epochs through labeled data = {config['epochs'] * num_labeled_one_epoch}")
 
-    
+    logger.write(f"\nUnlabeled Batch Size = {unlabeled_batch_size}")
+    logger.write(f"\nNumber of epochs through labeled data = {config['epochs']}\n")
+
+        
     # train the model
-    # start_time = time.time()
-    train(model, labeled_train_loader, unlabeled_train_loader, val_loader, config, run_results_path)
-    # end_time = time.time()
+    start_time = time.time()
+    train(model, labeled_train_loader, unlabeled_train_loader, val_loader, config, run_results_path,logger)
+    end_time = time.time()
 
-    # training_time_hours, training_time_minutes = divmod(end_time - start_time, 3600)
+    training_time_hours, training_time_minutes = divmod(end_time - start_time, 3600)
 
-    # print(f"Finished training in: {int(training_time_hours)} hours, {int(training_time_minutes)} minutes")
-
+    logger.write(f"\nFinished training in: {int(training_time_hours)} hours, {int(training_time_minutes)} minutes")
+    logger.close()
+    
 def collate_batch(batch):
     """
     Labeled batch: input_ids, attention_mask, labels
