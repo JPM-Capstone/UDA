@@ -213,7 +213,7 @@ def main(config_name):
     logger.write(f"\nNumber of epochs through labeled data = {config['epochs'] * num_labeled_one_epoch}")
 
     logger.write(f"\nUnlabeled Batch Size = {unlabeled_batch_size}")
-    logger.write(f"\nNumber of epochs through labeled data = {config['epochs']}\n")
+    logger.write(f"\nNumber of epochs through unlabeled data = {config['epochs']}\n")
 
         
     # train the model
@@ -221,7 +221,8 @@ def main(config_name):
     train(model, labeled_train_loader, unlabeled_train_loader, val_loader, config, run_results_path,logger)
     end_time = time.time()
 
-    training_time_hours, training_time_minutes = divmod(end_time - start_time, 3600)
+    training_time_hours, remainder_secs = divmod(end_time - start_time, 3600)
+    training_time_minutes, remainder_secs = divmod(remainder_secs, 60)
 
     logger.write(f"\nFinished training in: {int(training_time_hours)} hours, {int(training_time_minutes)} minutes")
     logger.close()

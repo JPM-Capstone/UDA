@@ -7,11 +7,11 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32GB
 #SBATCH --time=15:00:00
-#SBATCH --job-name=Job4
-#SBATCH --output=./uda_jobs/logs/batch_1/job4.log
+#SBATCH --job-name=Job20
+#SBATCH --output=./uda_jobs/logs/batch_1/job20.log
 
 source ~/.bashrc
 conda activate uda
 cd /home/as14229/NYU_HPC/UDA/
 
-python train.py labeled_100_idr_75
+python train.py labeled_5000_idr_100
