@@ -210,7 +210,7 @@ def main(config_name):
     logger.write(f"Labeled Batch Size = {labeled_batch_size}\n")
 
     num_labeled_one_epoch = labeled_batch_size * (len(unlabeled_train) // unlabeled_batch_size) / len(labeled_train)
-    logger.write(f"\nNumber of epochs through labeled data = {config['epochs'] * num_labeled_one_epoch}")
+    logger.write(f"Number of epochs through labeled data = {config['epochs'] * num_labeled_one_epoch}")
 
     logger.write(f"\nUnlabeled Batch Size = {unlabeled_batch_size}")
     logger.write(f"\nNumber of epochs through unlabeled data = {config['epochs']}\n")
