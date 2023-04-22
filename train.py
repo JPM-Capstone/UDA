@@ -159,7 +159,7 @@ def train(model, labeled_train_loader, unlabeled_train_loader, val_loader, confi
 
         torch.save(model.state_dict(), os.path.join(results_path, f"epoch_{epoch + 1}.pt"))
 
-        # print(f'Epoch {epoch+1}: val_loss={val_loss:.4f}, val_acc={val_acc:.4f}')
+        logger.write(f'Epoch {epoch+1}: val_loss={val_loss:.4f}, val_acc={val_acc:.4f}')
 
 def main(config_name):
 
