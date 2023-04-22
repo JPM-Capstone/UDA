@@ -122,7 +122,7 @@ def evaluate(model, val_loader, criterion):
 
     return val_loss/len(val_loader), val_acc/len(val_loader.dataset)
 
-def train(model, labeled_train_loader, unlabeled_train_loader, val_loader, config, results_path):
+def train(model, labeled_train_loader, unlabeled_train_loader, val_loader, config, results_path, logger):
 
     # Define the optimizer and loss function
     optimizer = optim.AdamW(model.parameters(), lr=5e-6)
@@ -218,7 +218,7 @@ def main(config_name):
         
     # train the model
     start_time = time.time()
-    train(model, labeled_train_loader, unlabeled_train_loader, val_loader, config, run_results_path,logger)
+    train(model, labeled_train_loader, unlabeled_train_loader, val_loader, config, run_results_path, logger)
     end_time = time.time()
 
     training_time_hours, remainder_secs = divmod(end_time - start_time, 3600)
